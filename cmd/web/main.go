@@ -39,6 +39,7 @@ func main() {
 
 func home(w http.ResponseWriter, r *http.Request) {
 	logger.Info("handling home page request", "method", r.Method, "url", r.URL.Path)
+	w.Header().Add("Server", "Go")
 	_, _ = w.Write([]byte("Hello from Zettel!"))
 }
 
@@ -61,4 +62,5 @@ func zettelCreate(w http.ResponseWriter, r *http.Request) {
 func zettelCreatePost(w http.ResponseWriter, r *http.Request) {
 	logger.Info("handling zettel create post request", "method", r.Method, "url", r.URL.Path)
 	w.WriteHeader(http.StatusCreated)
+	_, _ = w.Write([]byte("Save a new zettel to the DB..."))
 }
