@@ -23,8 +23,8 @@ clean:
 build: vet
 	go build -o build/zettel ./cmd/web
 
-run:
-	go run ./cmd/web
+run: build
+	./build/zettel
 
 all: build
 
