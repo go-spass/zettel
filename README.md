@@ -3,6 +3,9 @@
 Version Version 2.26.0 of the book, last updated 2026-03-07.
 The code is based on the latest version of the book which uses Go version 1.26.
 
+> **Note:** This project uses **PostgreSQL** instead of MySQL as used in the book.
+> Domain entities are named **zettel/zettels** instead of snippet/snippets.
+
 ## Running zettel
 To run the `zettel` application, you need to have Go installed on your
 machine. You can download Go from the [official website](https://golang.org/).
@@ -11,14 +14,18 @@ machine. You can download Go from the [official website](https://golang.org/).
 To build the project, navigate to the root of the project and run the
 following:
 ```bash
-make web
+make build
 ```
 
 ### Run the Project
 To run the project, navigate to the root of the project and run the
 following:
 ```bash
-./build/web
+make run
+```
+Or run the binary directly after building:
+```bash
+./build/zettel
 ```
 
 # Project Notes
@@ -27,22 +34,22 @@ following:
 This section covered routing requests to different handlers based on the
 path of the request.
 
-|   Route Pattern |         Handler | Action                                |
-|----------------:|----------------:|:--------------------------------------|
-|               / |          home() | Display the home page                 |
-|   /snippet/view |   snippetView() | Display a specific snippet            |
-| /snippet/create | snippetCreate() | Display a form for creating a snippet |
+|      Route Pattern |         Handler | Action                               |
+|-------------------:|----------------:|:-------------------------------------|
+|                  / |          home() | Display the home page                |
+|    /zettel/view |   zettelView() | Display a specific zettel            |
+| /zettel/create | zettelCreate() | Display a form for creating a zettel |
 
 #### Trailing slashes in route patterns
-It’s important to know that Go’s `servemux` has different matching rules
+It's important to know that Go's `servemux` has different matching rules
 depending on whether a route pattern ends with a trailing slash or not.
 
 **exact path**:
-- If the path does not have a trailing slash (e.g. `/snippet/create`), the
+- If the path does not have a trailing slash (e.g. `/zettel/create`), the
   pattern matches that path exactly.
 
 **sub-tree path**:
-- When a route ends with a trailing slash (e.g. "/" or "/snippet/"), the
+- When a route ends with a trailing slash (e.g. "/" or "/zettel/"), the
   pattern matches that path and any path that has that prefix.
 - To prevent subtree path patterns from acting like they have a wildcard
   at the end, you can append the special character sequence `{$}` to the
@@ -75,11 +82,11 @@ func exampleHandler(w http.ResponseWriter, r *http.Request) {
 For this section the routes will be updated to include wildcard segments
 as follows:
 
-|      Route Pattern |         Handler | Action                                |
-|-------------------:|----------------:|:--------------------------------------|
-|               /{$} |          home() | Display the home page                 |
-| /snippet/view/{id} |   snippetView() | Display a specific snippet            |
-|    /snippet/create | snippetCreate() | Display a form for creating a snippet |
+|         Route Pattern |         Handler | Action                               |
+|----------------------:|----------------:|:-------------------------------------|
+|                  /{$} |          home() | Display the home page                |
+| /zettel/view/{id} |   zettelView() | Display a specific zettel            |
+|    /zettel/create | zettelCreate() | Display a form for creating a zettel |
 
 ### Section 2.5 Specify HTTP Methods on Routes
 This section covers how to specify the HTTP methods that a route should
@@ -96,12 +103,12 @@ mux.HandleFunc("GET /{$}", home)
 In this section the routes will updated as follows:
 
 
-|          Route Pattern |              Handler | Action                                |
-|-----------------------:|---------------------:|:--------------------------------------|
-|               GET /{$} |               home() | Display the home page                 |
-| GET /snippet/view/{id} |        snippetView() | Display a specific snippet            |
-|    GET /snippet/create |      snippetCreate() | Display a form for creating a snippet |
-|   POST /snippet/create | snippetCreatePost()  | Save a new snippet to the database    |
+|              Route Pattern |              Handler | Action                               |
+|---------------------------:|---------------------:|:-------------------------------------|
+|               GET /{$} |               home() | Display the home page                |
+| GET /zettel/view/{id} |        zettelView() | Display a specific zettel            |
+|    GET /zettel/create |      zettelCreate() | Display a form for creating a zettel |
+|   POST /zettel/create | zettelCreatePost()  | Save a new zettel to the database    |
 
 ### Section 2.6 Customizing HTTP Responses
 In Go, by default, every response that your handlers send has the HTTP
@@ -113,7 +120,7 @@ received and processed successfully), plus three automatic system-generated head
 
 In this section the code will be updated to send appropriate HTTP status codes.
 
-#### Update createSnippetPost to return a 201 Created status code
+#### Update zettelCreatePost to return a 201 Created status code
 Use the `writeHeader()` method on the `http.ResponseWriter` to set the
 status code to 201 Created.
 
@@ -128,7 +135,7 @@ response. For example, to add a `Location` header to the response, you
 can do the following:
 
 ```golang
-w.Header().Add("Location", "/snippet/create")
+w.Header().Add("Location", "/zettel/create")
 ```
 
 ### Section 2.9 Service Static Files
@@ -136,18 +143,18 @@ In section 2.9 we will add support for serving static files such as CSS,
 so that we can style our application. To do this, we will use the
 `http.FileServer` and `http.StripPrefix` functions from the `net/http`.
 
-Go’s net/http package ships with a built-in http.FileServer handler which
-you can use to serve files over HTTP from a specific directory. Let’s add
+Go's net/http package ships with a built-in http.FileServer handler which
+you can use to serve files over HTTP from a specific directory. Let's add
 a new route to our application so that all GET requests which begin with
 "/static/" are handled using this.
 
 
-|          Route Pattern |              Handler | Action                                |
-|-----------------------:|---------------------:|:--------------------------------------|
-|               GET /{$} |               home() | Display the home page                 |
-| GET /snippet/view/{id} |        snippetView() | Display a specific snippet            |
-|    GET /snippet/create |      snippetCreate() | Display a form for creating a snippet |
-|   POST /snippet/create |  snippetCreatePost() | Save a new snippet to the database    |
+|              Route Pattern |              Handler | Action                               |
+|---------------------------:|---------------------:|:-------------------------------------|
+|               GET /{$} |               home() | Display the home page                |
+| GET /zettel/view/{id} |        zettelView() | Display a specific zettel            |
+|    GET /zettel/create |      zettelCreate() | Display a form for creating a zettel |
+|   POST /zettel/create |  zettelCreatePost() | Save a new zettel to the database    |
 |           GET /static/ |    http.FileServer() | Serve a specific static file          |
 
 > Remember: The pattern "GET /static/" is a subtree path pattern, so it acts a bit like
@@ -157,34 +164,34 @@ a new route to our application so that all GET requests which begin with
 ### Getting Started
 **Connecting to the Database via the Terminal**
 ```sh
-# Connect as Root
-mysql -u root -p
+# Connect as PostgreSQL superuser
+psql -U postgres
 # Connect as web application user
-mysql -D snippetbox -u web -p
+psql -d zettel -U web
 ```
 
 **Loading Sample Database Records**
 ```sh
- mysql -D snippetbox -u web -p < ./scripts/insert_snippets.sql
+psql -d zettel -U web < ./scripts/insert_zettels.sql
 ```
 
 ### 4.8 Multiple Record SQL Queries
-In this section the book covered the patern for executing SQL statements
-that return multiple rows.  I’ll demonstrate this by updating the
-`SnippetModel.Latest()` method to return the ten most-recently created
-snippets (so long as they haven’t expired) using the following SQL query:
+In this section the book covered the pattern for executing SQL statements
+that return multiple rows.  I'll demonstrate this by updating the
+`ZettelModel.Latest()` method to return the ten most-recently created
+zettels (so long as they haven't expired) using the following SQL query:
 
 ```sql
-SELECT id, title, content, created, expires FROM snippets
-WHERE expires > UTC_TIMESTAMP() ORDER BY id DESC LIMIT 10
+SELECT id, title, content, created, expires FROM zettels
+WHERE expires > NOW() ORDER BY id DESC LIMIT 10
 ```
 
 **Using the Query in the Latest() method**
 ```golang
-func (m *SnippetModel) Latest() ([]Snippet, error) {
+func (m *ZettelModel) Latest() ([]Zettel, error) {
     // Write the SQL statement we want to execute.
-    stmt := `SELECT id, title, content, created, expires FROM snippets
-    WHERE expires > UTC_TIMESTAMP() ORDER BY id DESC LIMIT 10`
+    stmt := `SELECT id, title, content, created, expires FROM zettels
+    WHERE expires > NOW() ORDER BY id DESC LIMIT 10`
 
     // Use the Query() method on the connection pool to execute our
     // SQL statement. This returns a sql.Rows resultset containing the result of
@@ -201,8 +208,8 @@ func (m *SnippetModel) Latest() ([]Snippet, error) {
     // trying to close a nil resultset.
     defer rows.Close()
 
-    // Initialize an empty slice to hold the Snippet structs.
-    var snippets []Snippet
+    // Initialize an empty slice to hold the Zettel structs.
+    var zettels []Zettel
 
     // Use rows.Next to iterate through the rows in the resultset. This
     // prepares the first (and then each subsequent) row to be acted on by the
@@ -210,20 +217,19 @@ func (m *SnippetModel) Latest() ([]Snippet, error) {
     // resultset automatically closes itself and frees up the underlying
     // database connection.
     for rows.Next() {
-        // Create a new zero value Snippet struct.
-        var s Snippet
+        // Create a new zero value Zettel struct.
+        var z Zettel
         // Use rows.Scan() to copy the values from each field in the row[…]
-        // to the
-        // new Snippet struct that we created. Again, the arguments to row.Scan()
-        // must be pointers to the place you want to copy the data into, and the
-        // number of arguments must be exactly the same as the number of
-        // columns returned by your statement.
-        err = rows.Scan(&s.ID, &s.Title, &s.Content, &s.Created, &s.Expires)
+        // to the new Zettel struct that we created. Again, the arguments to
+        // row.Scan() must be pointers to the place you want to copy the data
+        // into, and the number of arguments must be exactly the same as the
+        // number of columns returned by your statement.
+        err = rows.Scan(&z.ID, &z.Title, &z.Content, &z.Created, &z.Expires)
         if err != nil {
             return nil, err
         }
-        // Append it to the slice of snippets.
-        snippets = append(snippets, s)
+        // Append it to the slice of zettels.
+        zettels = append(zettels, z)
     }
 
     // When the rows.Next() loop has finished we call rows.Err() to retrieve any
@@ -234,8 +240,8 @@ func (m *SnippetModel) Latest() ([]Snippet, error) {
         return nil, err
     }
 
-    // If everything went OK then return the Snippets slice.
-    return snippets, nil
+    // If everything went OK then return the Zettels slice.
+    return zettels, nil
 }
 
 ```
@@ -243,12 +249,12 @@ func (m *SnippetModel) Latest() ([]Snippet, error) {
 > Important: Closing a resultset with defer rows.Close() is critical in
 > the code above. As long as a resultset is open it will keep the underlying
 > database connection open… so if something goes wrong in this method and
-> the resultset isn’t closed, it can rapidly lead to all the connections in
+> the resultset isn't closed, it can rapidly lead to all the connections in
 > your pool being used up.
 
 ## Section 5 Dynamic HTML
 ### 5.1 Displaying Dynamic Data
-Currently our snippetView handler function fetches a models.Snippet value
+Currently our zettelView handler function fetches a models.Zettel value
 from the database and then dumps the contents out in a plain-text HTTP
-response. In this chapter we’ll improve this so that the data is displayed
+response. In this chapter we'll improve this so that the data is displayed
 in a proper HTML web page.

@@ -24,9 +24,10 @@ func main() {
 	// So if you have the route pattern "/{$}", it effectively means match a single
 	// slash, followed by nothing else. It will only match requests where the
 	// URL path is exactly /.
-	mux.HandleFunc("/{$}", home)
-	mux.HandleFunc("/zettel/view/{id}", zettelView)
-	mux.HandleFunc("/zettel/create", zettelCreate)
+	mux.HandleFunc("GET /{$}", home)
+	mux.HandleFunc("GET /zettel/view/{id}", zettelView)
+	mux.HandleFunc("GET /zettel/create", zettelCreate)
+	mux.HandleFunc("POST /zettel/create", zettelCreatePost)
 
 	logger.Info("starting zettel server", "addr", ":4000")
 	err := http.ListenAndServe(":4000", mux)
@@ -55,4 +56,9 @@ func zettelView(w http.ResponseWriter, r *http.Request) {
 func zettelCreate(w http.ResponseWriter, r *http.Request) {
 	logger.Info("handling zettel create request", "method", r.Method, "url", r.URL.Path)
 	_, _ = w.Write([]byte("Display a form for creating a new zettel..."))
+}
+
+func zettelCreatePost(w http.ResponseWriter, r *http.Request) {
+	logger.Info("handling zettel create post request", "method", r.Method, "url", r.URL.Path)
+	w.WriteHeader(http.StatusCreated)
 }
