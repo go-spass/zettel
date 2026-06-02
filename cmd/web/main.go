@@ -14,7 +14,15 @@ func main() {
 	// Use the http.NewServeMux() function to initialize a new servemux, then
 	// register the home function as the handler for the "/" URL pattern.
 	mux := http.NewServeMux()
-	mux.HandleFunc("/", home)
+
+	// To prevent subtree path patterns from acting like they have a wildcard at
+	// the end, you can append the special character sequence {$} to the end of
+	// the pattern — like "/{$}" or "/static/{$}".
+	//
+	// So if you have the route pattern "/{$}", it effectively means match a single
+	// slash, followed by nothing else. It will only match requests where the
+	// URL path is exactly /.
+	mux.HandleFunc("/{$}", home)
 	mux.HandleFunc("/zettel/view", zettelView)
 	mux.HandleFunc("/zettel/create", zettelCreate)
 
