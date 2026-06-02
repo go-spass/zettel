@@ -5,6 +5,7 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
+	"strconv"
 )
 
 var logger *slog.Logger
@@ -41,9 +42,13 @@ func home(w http.ResponseWriter, r *http.Request) {
 }
 
 func zettelView(w http.ResponseWriter, r *http.Request) {
-	id := r.PathValue("id")
+	id, err := strconv.Atoi(r.PathValue("id"))
+	if err != nil || id < 1 {
+		http.NotFound(w, r)
+		return
+	}
 	logger.Info("handling zettel view request", "method", r.Method, "url", r.URL.Path, "id", id)
-	_, _ = fmt.Fprintf(w, "Display zettel with id=%s...", id)
+	_, _ = fmt.Fprintf(w, "Display zettel with id=%d...", id)
 }
 
 func zettelCreate(w http.ResponseWriter, r *http.Request) {
