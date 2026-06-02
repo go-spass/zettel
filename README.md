@@ -138,6 +138,54 @@ can do the following:
 w.Header().Add("Location", "/zettel/create")
 ```
 
+### Section 2.7 Project Structure
+This section reorganizes the project into a conventional Go layout,
+separating concerns across multiple files and directories.
+
+```
+.
+├── cmd/
+│   └── web/
+│       ├── main.go       # server setup, routing, logger
+│       └── handlers.go   # HTTP handler functions
+└── ui/
+    └── html/
+        └── pages/
+            └── home.tmpl.html   # page-level HTML templates
+```
+
+**Key decisions:**
+- `cmd/web/` contains all application entry-point code; `main.go` owns
+  server setup and routing while `handlers.go` owns handler logic.
+- `ui/html/pages/` holds page-level templates. A `ui/html/partials/`
+  directory will be added later for shared template fragments.
+- All files in `cmd/web/` share `package main`, so the `logger` variable
+  declared in `main.go` is accessible from `handlers.go` without passing
+  it explicitly.
+
+### Section 2.8 HTML Templating
+This section introduces Go's `html/template` package to render proper
+HTML responses instead of plain text.
+
+The `home` handler parses and executes a template file at request time:
+
+```go
+ts, err := template.ParseFiles("./ui/html/pages/home.tmpl.html")
+if err != nil {
+    logger.Error("could not parse home.tmpl.html", "error", err.Error())
+    http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+    return
+}
+err = ts.Execute(w, nil)
+if err != nil {
+    logger.Error("could not execute template home.tmpl.html", "error", err.Error())
+    http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+}
+```
+
+> Note: Parsing the template on every request is fine for development but
+> will be replaced with a cached approach in a later chapter.
+
 ### Section 2.9 Service Static Files
 In section 2.9 we will add support for serving static files such as CSS,
 so that we can style our application. To do this, we will use the

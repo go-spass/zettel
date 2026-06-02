@@ -22,7 +22,11 @@ The built binary is `./build/zettel`.
 
 ## Project Structure
 ```
-cmd/web/          # application entry point and handlers
+cmd/web/
+  main.go         # server setup, routing, logger declaration
+  handlers.go     # HTTP handler functions
+ui/html/
+  pages/          # page-level HTML templates (*.tmpl.html)
 build/            # compiled binary output (gitignored)
 scripts/          # SQL scripts (e.g. seed data)
 ```
