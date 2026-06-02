@@ -44,6 +44,7 @@ func home(w http.ResponseWriter, r *http.Request) {
 func zettelView(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(r.PathValue("id"))
 	if err != nil || id < 1 {
+		logger.Error("invalid zettel view request", "method", r.Method, "url", r.URL.Path, "id", r.PathValue("id"))
 		http.NotFound(w, r)
 		return
 	}
