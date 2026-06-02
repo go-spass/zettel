@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log/slog"
 	"net/http"
 	"os"
@@ -23,7 +24,7 @@ func main() {
 	// slash, followed by nothing else. It will only match requests where the
 	// URL path is exactly /.
 	mux.HandleFunc("/{$}", home)
-	mux.HandleFunc("/zettel/view", zettelView)
+	mux.HandleFunc("/zettel/view/{id}", zettelView)
 	mux.HandleFunc("/zettel/create", zettelCreate)
 
 	logger.Info("starting zettel server", "addr", ":4000")
@@ -40,8 +41,9 @@ func home(w http.ResponseWriter, r *http.Request) {
 }
 
 func zettelView(w http.ResponseWriter, r *http.Request) {
-	logger.Info("handling zettel view request", "method", r.Method, "url", r.URL.Path)
-	_, _ = w.Write([]byte("Display a specific zettel..."))
+	id := r.PathValue("id")
+	logger.Info("handling zettel view request", "method", r.Method, "url", r.URL.Path, "id", id)
+	_, _ = fmt.Fprintf(w, "Display zettel with id=%s...", id)
 }
 
 func zettelCreate(w http.ResponseWriter, r *http.Request) {
