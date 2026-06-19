@@ -9,7 +9,7 @@
 - **Server port**: `:4000`
 
 ## Book Progress
-Currently implemented through **Chapter 2.3** (routing). See `README.md` for detailed notes on each section.
+Currently implemented through **Chapter 2.8** (HTML template composition). See `README.md` for detailed notes on each section.
 
 ## Build & Run
 ```bash
@@ -23,12 +23,14 @@ The built binary is `./build/zettel`.
 ## Project Structure
 ```
 cmd/web/
-  main.go         # server setup, routing, logger declaration
-  handlers.go     # HTTP handler functions
+  main.go           # server setup, routing, logger declaration
+  handlers.go       # HTTP handler functions
+  handlers_test.go  # handler integration tests
 ui/html/
-  pages/          # page-level HTML templates (*.tmpl.html)
-build/            # compiled binary output (gitignored)
-scripts/          # SQL scripts (e.g. seed data)
+  base.tmpl.html    # shared base template (chrome: head, header, nav, footer)
+  pages/            # page-specific templates (*.tmpl.html)
+build/              # compiled binary output (gitignored)
+scripts/            # SQL scripts (e.g. seed data)
 ```
 
 ## Routes (current)
