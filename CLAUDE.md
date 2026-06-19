@@ -53,3 +53,8 @@ Uses `log/slog` with `slog.NewJSONHandler(os.Stdout, nil)` — structured JSON l
 ## Deviations from the Book
 - PostgreSQL instead of MySQL — use `$1`, `$2` placeholders (not `?`)
 - Domain entity is "zettel" not "snippet"
+
+<!-- SPECKIT START -->
+For additional context about technologies to be used, project structure,
+shell commands, and other important information, read the current plan
+<!-- SPECKIT END -->
