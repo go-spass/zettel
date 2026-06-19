@@ -1,0 +1,24 @@
+{{define "base"}}
+<!doctype html>
+<html lang='en'>
+    <head>
+        <meta charset='utf-8'>
+        <title>{{template "title" .}} - Zettel</title>
+    </head>
+    <body>
+        <header>
+            <h1><a href='/'>Zettel</a></h1>
+        </header>
+        <nav>
+            <div>
+                <a href='/'>Home</a>
+                <a href='/zettel/create'>Create zettel</a>
+            </div>
+        </nav>
+        <main>
+            {{template "main" .}}
+        </main>
+        <footer>Powered by <a href='https://go.dev/'>Go</a></footer>
+    </body>
+</html>
+{{end}}
