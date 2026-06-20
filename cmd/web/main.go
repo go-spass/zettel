@@ -1,6 +1,7 @@
 package main
 
 import (
+	"html/template"
 	"log/slog"
 	"net/http"
 	"os"
@@ -8,8 +9,31 @@ import (
 
 var logger *slog.Logger
 
+func validateTemplates() error {
+	pages := []string{
+		"./ui/html/pages/home.tmpl.html",
+		"./ui/html/pages/zettel-view.tmpl.html",
+		"./ui/html/pages/zettel-create.tmpl.html",
+	}
+	for _, page := range pages {
+		if _, err := template.ParseFiles(
+			"./ui/html/base.tmpl.html",
+			"./ui/html/partials/nav.tmpl.html",
+			page,
+		); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func main() {
 	logger = slog.New(slog.NewJSONHandler(os.Stdout, nil))
+
+	if err := validateTemplates(); err != nil {
+		logger.Error("template validation failed", "error", err)
+		os.Exit(1)
+	}
 
 	// Use the http.NewServeMux() function to initialize a new servemux, then
 	// register the home function as the handler for the "/" URL pattern.
