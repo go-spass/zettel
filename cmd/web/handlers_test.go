@@ -94,9 +94,12 @@ func TestZettelCreateChrome(t *testing.T) {
 // T014: TestNewPageInheritsChrome — a minimal template (title+main only) must render
 // with full shared chrome from the base template, proving zero-duplication architecture.
 func TestNewPageInheritsChrome(t *testing.T) {
-	ts, err := template.ParseFiles("./ui/html/base.tmpl.html")
+	ts, err := template.ParseFiles(
+		"./ui/html/base.tmpl.html",
+		"./ui/html/partials/nav.tmpl.html",
+	)
 	if err != nil {
-		t.Fatalf("could not parse base template: %v", err)
+		t.Fatalf("could not parse base and nav templates: %v", err)
 	}
 	ts, err = ts.Parse(`{{define "title"}}New Page{{end}}{{define "main"}}<p>New content</p>{{end}}`)
 	if err != nil {
@@ -112,4 +115,25 @@ func TestNewPageInheritsChrome(t *testing.T) {
 	assertBodyContains(t, body, "<header>")
 	assertBodyContains(t, body, "<nav>")
 	assertBodyContains(t, body, "<title>New Page - Zettel</title>")
+}
+
+// T015: TestNavPartialContent — nav partial must render the exact navigation links.
+func TestNavPartialContent(t *testing.T) {
+	ts, err := template.ParseFiles(
+		"./ui/html/base.tmpl.html",
+		"./ui/html/partials/nav.tmpl.html",
+		"./ui/html/pages/home.tmpl.html",
+	)
+	if err != nil {
+		t.Fatalf("could not parse templates: %v", err)
+	}
+
+	var buf bytes.Buffer
+	if err := ts.ExecuteTemplate(&buf, "base", nil); err != nil {
+		t.Fatalf("could not execute base template: %v", err)
+	}
+
+	body := buf.String()
+	assertBodyContains(t, body, `<a href='/'>Home</a>`)
+	assertBodyContains(t, body, `<a href='/zettel/create'>Create zettel</a>`)
 }

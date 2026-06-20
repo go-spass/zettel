@@ -9,12 +9,7 @@
         <header>
             <h1><a href='/'>Zettel</a></h1>
         </header>
-        <nav>
-            <div>
-                <a href='/'>Home</a>
-                <a href='/zettel/create'>Create zettel</a>
-            </div>
-        </nav>
+        {{template "nav" .}}
         <main>
             {{template "main" .}}
         </main>
