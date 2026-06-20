@@ -9,7 +9,7 @@
 - **Server port**: `:4000`
 
 ## Book Progress
-Currently implemented through **Chapter 2.8** (HTML template composition). See `README.md` for detailed notes on each section.
+Currently implemented through **Chapter 2.9** (HTML template partials). See `README.md` for detailed notes on each section.
 
 ## Build & Run
 ```bash
@@ -27,7 +27,8 @@ cmd/web/
   handlers.go       # HTTP handler functions
   handlers_test.go  # handler integration tests
 ui/html/
-  base.tmpl.html    # shared base template (chrome: head, header, nav, footer)
+  base.tmpl.html    # shared base template (chrome: head, header, nav via partial, footer)
+  partials/         # reusable partial templates (nav.tmpl.html)
   pages/            # page-specific templates (*.tmpl.html)
 build/              # compiled binary output (gitignored)
 scripts/            # SQL scripts (e.g. seed data)
@@ -59,5 +60,5 @@ Uses `log/slog` with `slog.NewJSONHandler(os.Stdout, nil)` — structured JSON l
 <!-- SPECKIT START -->
 For additional context about technologies to be used, project structure,
 shell commands, and other important information, read the current plan:
-`specs/001-base-template-composition/plan.md`
+`specs/002-html-nav-partial/plan.md`
 <!-- SPECKIT END -->
